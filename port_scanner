@@ -1,0 +1,34 @@
+import socket
+import argparse
+def scan_ports(host, start_port, end_port):
+    print(f"Scanning {host} from port {start_port} to {end_port}...\n")
+    open_ports = []
+
+    for port in range(start_port, end_port+1):
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(0.5)
+            result = sock.connect_ex((host, port))
+            if result == 0:
+                print(f"[+] Port {port} is open")
+                open_ports.append(port)
+            sock.close()
+        except KeyboardInterrupt:
+            print("\nScan interrupted by user.")
+            break
+        except socket.gaierror:
+            print("Hostname could not be resolved.")
+            break
+        except socket.error:
+            print("Couldn't connect to server.")
+            break
+    return open_ports
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Simple Python Port Scanner")
+    parser.add_argument("host", help="Target host to scan (IP or domain)")
+    parser.add_argument("start_port", type=int, help="Start of port range")
+    parser.add_argument("end_port", type=int, help="End of port range")
+
+    args = parser.parse_args()
+    scan_ports(args.host, args.start_port, args.end_port)
